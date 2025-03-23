@@ -1,0 +1,10 @@
+﻿{
+  "Зеленоград": {
+    "Gismeteo": "weather-zelenograd-11443",
+    "latitude": 55,
+    "longitude": 37
+  },
+  "Москва": {
+    "Gismeteo": "weather-moscow-4368"
+  }
+}
