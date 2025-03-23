@@ -1,10 +1,14 @@
 ﻿{
   "Зеленоград": {
     "Gismeteo": "weather-zelenograd-11443",
-    "latitude": 55,
-    "longitude": 37
+    "latitude": 55.9825,
+    "longitude": 37.1814,
+    "timezone": "Europe/Moscow"
   },
   "Москва": {
-    "Gismeteo": "weather-moscow-4368"
+    "Gismeteo": "weather-moscow-4368",
+    "latitude": 55.7522,
+    "longitude": 37.6156,
+    "timezone": "Europe/Moscow"
   }
 }

@@ -24,7 +24,7 @@ namespace ServiceLayer.Services.Parsing
                 $"{Environment.NewLine}Request was: {requestString}");
 
             //Console.WriteLine($" Received message:{Environment.NewLine}{await response.Content.ReadAsStringAsync()}");
-            ArhiveResponse? arhive = JsonSerializer.Deserialize<ArhiveResponse>(response.Content.ReadAsStream());
+            OpenMeteoResponse? arhive = JsonSerializer.Deserialize<OpenMeteoResponse>(response.Content.ReadAsStream());
             if (arhive == null) throw new Exception($"Archive record deserilization failed;" +
                 $" Received message:{Environment.NewLine}{await response.Content.ReadAsStringAsync()}");
            
@@ -52,7 +52,7 @@ namespace ServiceLayer.Services.Parsing
         }
     }
 
-    public class ArhiveResponse
+    public class OpenMeteoResponse
     {
         public decimal latitude { get; set; }
         public decimal longitude { get; set; }
@@ -78,8 +78,10 @@ namespace ServiceLayer.Services.Parsing
             public IEnumerable<string> time { get; set; }
             public IEnumerable<decimal?> temperature_2m_max { get; set; }
             public IEnumerable<decimal?> temperature_2m_min { get; set; }
-            public IEnumerable<decimal?> temperature_2m_mean { get; set; }
+            public IEnumerable<decimal?>? temperature_2m_mean { get; set; }
             public IEnumerable<decimal?> precipitation_sum { get; set; }
+            public IEnumerable<decimal?> wind_speed_10m_max { get; set; }
+            public IEnumerable<decimal?> wind_gusts_10m_max { get; set; }
 
         }
     }

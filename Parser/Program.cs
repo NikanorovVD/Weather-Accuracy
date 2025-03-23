@@ -38,6 +38,7 @@ namespace Parser
 
             AppDbContext dbContext = new(optionsBuilder.Options);
             GismeteoParser gismeteoParser = new GismeteoParser();
+            OpenMeteoParser openMeteoParser = new OpenMeteoParser();
 
             await dbContext.Database.MigrateAsync();
 
@@ -47,11 +48,19 @@ namespace Parser
                 {
                     Dictionary<string, string> regionConfig = sourcesConfiguration.GetSection(region).Get<Dictionary<string, string>>()!;
                     string gismeteoRegionName = regionConfig["Gismeteo"];
+                    string latitude = regionConfig["latitude"];
+                    string longitude = regionConfig["longitude"];
+                    string timezone = regionConfig["timezone"];
                     try
                     {
-                        IEnumerable<WeatherRecord> weaterRecords = await gismeteoParser.GetWeaterRecordsAsync(region, gismeteoRegionName);
+                        IEnumerable<WeatherRecord> gismeteoData = await gismeteoParser.GetWeaterRecordsAsync(region, gismeteoRegionName);
                         programLogger.LogInformation("parse data from {Source} for region {Region}", "Gismeteo", region);
-                        await dbContext.WeaterRecords.AddRangeAsync(weaterRecords);
+                        await dbContext.WeaterRecords.AddRangeAsync(gismeteoData);
+
+                        IEnumerable<WeatherRecord> openMeteoData = await openMeteoParser.GetWeaterRecordsAsync(region, latitude, longitude, timezone);
+                        programLogger.LogInformation("parse data from {Source} for region {Region}", "OpenMeteo", region);
+                        await dbContext.WeaterRecords.AddRangeAsync(openMeteoData);
+
                         await dbContext.SaveChangesAsync();
                     }
                     catch (Exception e)
