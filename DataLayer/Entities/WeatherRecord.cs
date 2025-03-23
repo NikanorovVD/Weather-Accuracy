@@ -15,14 +15,9 @@
         public decimal? TemperatureMax { get; set; }
         public decimal? TemperatureMin { get; set; }
         public decimal? Precipitation { get; set; }
-        public string? CloudCover { get; set; }
         public decimal? WindSpeed { get; set; }
         public decimal? WindGust { get; set; }
-        public string? WindDirection { get; set; }
         public decimal? Humidity { get; set; }
-        public decimal? AtmosphericPressureMax { get; set; }
-        public decimal? AtmosphericPressureMin { get; set; }
-        public uint? UVIndex { get; set; }
-        public uint? GeomagneticActivity { get; set; }
+        public decimal? AtmosphericPressureAvg { get; set; }
     }
 }

@@ -32,15 +32,16 @@ namespace ServiceLayer.Services.Parsing
             {
                 WeatherRecord record = new WeatherRecord()
                 {
-                    Region = regionName,
+                    ForecastDateTime = DateTime.UtcNow.AddDays(i),
                     Source = "OpenMeteo",
+                    Region = regionName,
+
                     TemperatureMin = openMeteoResponse.daily.temperature_2m_min.ElementAt(i),
                     TemperatureMax = openMeteoResponse.daily.temperature_2m_max.ElementAt(i),
                     TemperatureAvg = openMeteoResponse.daily.temperature_2m_mean.ElementAt(i),
                     WindSpeed = openMeteoResponse.daily.wind_speed_10m_max.ElementAt(i),
                     WindGust = openMeteoResponse.daily.wind_gusts_10m_max.ElementAt(i),
-                    Precipitation = openMeteoResponse.daily.precipitation_sum.ElementAt(i),
-                    ForecastDateTime = DateTime.UtcNow.AddDays(i)
+                    Precipitation = openMeteoResponse.daily.precipitation_sum.ElementAt(i)
                 };
                 records.Add(record);
             }

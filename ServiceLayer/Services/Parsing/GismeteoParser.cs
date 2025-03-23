@@ -42,22 +42,18 @@ namespace ServiceLayer.Services.Parsing
 
             for (int i = 0; i < MaxDays; i++)
             {
+                records[i].ForecastDateTime = today.AddDays(i);
+                records[i].Source = "Gismeteo";
+                records[i].Region = regionName;
+
                 records[i].TemperatureAvg = temprsAvg[i];
                 records[i].TemperatureMax = temprsMax[i];
                 records[i].TemperatureMin = temprsMin[i];
                 records[i].Precipitation = preticipations[i];
-                records[i].AtmosphericPressureMin = pressureMin[i];
-                records[i].AtmosphericPressureMax = pressureMax[i];
+                records[i].AtmosphericPressureAvg = (pressureMin[i]+ pressureMax[i]) / 2;
                 records[i].Humidity = humidity[i];
-                records[i].UVIndex = uv[i];
-                records[i].GeomagneticActivity = geomagnetic[i];
                 records[i].WindSpeed = windSpeed[i];
                 records[i].WindGust = windGust[i];
-                records[i].WindDirection = windDirection[i];
-                records[i].CloudCover = coudCover[i];
-                records[i].ForecastDateTime = today.AddDays(i);
-                records[i].Source = "Gismeteo";
-                records[i].Region = regionName;
             }
 
             return records[..MaxDays];

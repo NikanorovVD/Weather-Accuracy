@@ -44,17 +44,8 @@ namespace ServiceLayer.Models
             if (forecast.Humidity == null || fact.Humidity == null) Humidity = null;
             else Humidity = forecast.Humidity - fact.Humidity;
 
-            if (forecast.AtmosphericPressureMax == null || fact.AtmosphericPressureMax == null) AtmosphericPressureMax = null;
-            else AtmosphericPressureMax = forecast.AtmosphericPressureMax - fact.AtmosphericPressureMax;
-
-            if (forecast.AtmosphericPressureMin == null || fact.AtmosphericPressureMin == null) AtmosphericPressureMin = null;
-            else AtmosphericPressureMin = forecast.AtmosphericPressureMin - fact.AtmosphericPressureMin;
-
-            if (forecast.UVIndex == null || fact.UVIndex == null) UVIndex = null;
-            else UVIndex = forecast.UVIndex - fact.UVIndex;
-
-            if (forecast.GeomagneticActivity == null || fact.GeomagneticActivity == null) GeomagneticActivity = null;
-            else GeomagneticActivity = forecast.GeomagneticActivity - fact.GeomagneticActivity;
+            if (forecast.AtmosphericPressureAvg == null || fact.AtmosphericPressureAvg == null) AtmosphericPressureMax = null;
+            else AtmosphericPressureMax = forecast.AtmosphericPressureAvg - fact.AtmosphericPressureAvg;
         }
     }
 }

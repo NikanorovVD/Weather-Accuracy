@@ -78,7 +78,7 @@ namespace ServiceLayer.Services.Parsing
             public IEnumerable<string> time { get; set; }
             public IEnumerable<decimal?> temperature_2m_max { get; set; }
             public IEnumerable<decimal?> temperature_2m_min { get; set; }
-            public IEnumerable<decimal?>? temperature_2m_mean { get; set; }
+            public IEnumerable<decimal?> temperature_2m_mean { get; set; }
             public IEnumerable<decimal?> precipitation_sum { get; set; }
             public IEnumerable<decimal?> wind_speed_10m_max { get; set; }
             public IEnumerable<decimal?> wind_gusts_10m_max { get; set; }
