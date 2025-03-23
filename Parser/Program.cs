@@ -38,27 +38,27 @@ namespace Parser
 
 
             AppDbContext dbContext = new(optionsBuilder.Options);
-            GismeteoParser gismeteoParser = new GismeteoParser();
-            OpenMeteoParser openMeteoParser = new OpenMeteoParser();
-
             await dbContext.Database.MigrateAsync();
 
             while (true)
             {
+                List<IWeaterParser> weaterParsers = [
+                    new GismeteoParser(),
+                    new OpenMeteoParser()
+                    ];
+
                 foreach (string region in regions)
                 {
                     DataSource dataSource = sourcesConfiguration.GetSection(region).Get<DataSource>()!;
                     dataSource.RegionName = region;
                     try
                     {
-                        IEnumerable<WeatherRecord> gismeteoData = await gismeteoParser.GetWeaterRecordsAsync(dataSource);
-                        programLogger.LogInformation("parse data from {Source} for region {Region}", "Gismeteo", region);
-                        await dbContext.WeaterRecords.AddRangeAsync(gismeteoData);
-
-                        IEnumerable<WeatherRecord> openMeteoData = await openMeteoParser.GetWeaterRecordsAsync(dataSource);
-                        programLogger.LogInformation("parse data from {Source} for region {Region}", "OpenMeteo", region);
-                        await dbContext.WeaterRecords.AddRangeAsync(openMeteoData);
-
+                        foreach(IWeaterParser parser in weaterParsers)
+                        {
+                            IEnumerable<WeatherRecord> data = await parser.GetWeaterRecordsAsync(dataSource);
+                            programLogger.LogInformation("parse {DataCount} records from {Source} for region {Region}", data.Count(), parser.SourceName, region);
+                            await dbContext.WeaterRecords.AddRangeAsync(data);
+                        }
                         await dbContext.SaveChangesAsync();
                     }
                     catch (Exception e)

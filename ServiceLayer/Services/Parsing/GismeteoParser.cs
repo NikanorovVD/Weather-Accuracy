@@ -6,11 +6,11 @@ using ServiceLayer.Models.Errors;
 
 namespace ServiceLayer.Services.Parsing
 {
-    public class GismeteoParser
+    public class GismeteoParser: IWeaterParser
     {      
         public const int MaxDays = 10;
-        public const string SourceName = "Gismeteo";
         private static IHtmlCollection<IElement> _rows;
+        public string SourceName => "Gismeteo";
 
         public async Task<IEnumerable<WeatherRecord>> GetWeaterRecordsAsync(DataSource dataSource)
         {    

@@ -6,12 +6,14 @@ using System.Text.Json;
 
 namespace ServiceLayer.Services.Parsing
 {
-    public class OpenMeteoParser
+    public class OpenMeteoParser: IWeaterParser
     {
         string _url = "https://api.open-meteo.com/v1/forecast";
         public const int MaxDays = 16;
-        public const string SourceName = "OpenMeteo";
         private static readonly CultureInfo _culture = CultureInfo.CreateSpecificCulture("en-US");
+
+        public string SourceName => "OpenMeteo";
+
         public async Task<IEnumerable<WeatherRecord>> GetWeaterRecordsAsync(DataSource dataSource)
         {
             string requestString = QueryHelper.CreateQuery(_url,
