@@ -1,5 +1,7 @@
 ﻿using DataLayer.Entities;
+using ServiceLayer.Models;
 using ServiceLayer.Models.Errors;
+using System.Globalization;
 using System.Text.Json;
 
 namespace ServiceLayer.Services.Parsing
@@ -8,13 +10,15 @@ namespace ServiceLayer.Services.Parsing
     {
         string _url = "https://api.open-meteo.com/v1/forecast";
         public const int MaxDays = 16;
-        public async Task<IEnumerable<WeatherRecord>> GetWeaterRecordsAsync(string regionName, string latitude, string longitude, string timezone)
+        public const string SourceName = "OpenMeteo";
+        private static readonly CultureInfo _culture = CultureInfo.CreateSpecificCulture("en-US");
+        public async Task<IEnumerable<WeatherRecord>> GetWeaterRecordsAsync(DataSource dataSource)
         {
             string requestString = QueryHelper.CreateQuery(_url,
-                ("latitude", latitude),
-                ("longitude", longitude),
+                ("latitude", dataSource.Latitude.ToString(_culture)),
+                ("longitude", dataSource.Longitude.ToString(_culture)),
                 ("daily", "temperature_2m_max,wind_speed_10m_max,temperature_2m_min,temperature_2m_mean,precipitation_sum,wind_gusts_10m_max"),
-                ("timezone", timezone),
+                ("timezone", dataSource.Timezone),
                 ("forecast_days", MaxDays.ToString())
                 );
 
@@ -27,13 +31,13 @@ namespace ServiceLayer.Services.Parsing
                 throw new RequestException("Error status code", requestString, response.StatusCode, content);
 
             OpenMeteoResponse? openMeteoResponse = JsonSerializer.Deserialize<OpenMeteoResponse>(content) 
-                ?? throw new RequestException("Error status code", requestString, response.StatusCode, content);
+                ?? throw new RequestException("Error deserilizing data", requestString, response.StatusCode, content);
 
             return Enumerable.Range(0, MaxDays).Select(i => new WeatherRecord()
             {
                 ForecastDateTime = DateTime.UtcNow.AddDays(i),
-                Source = "OpenMeteo",
-                Region = regionName,
+                Source = SourceName,
+                Region = dataSource.RegionName,
 
                 TemperatureMin = openMeteoResponse.daily.temperature_2m_min.ElementAt(i),
                 TemperatureMax = openMeteoResponse.daily.temperature_2m_max.ElementAt(i),

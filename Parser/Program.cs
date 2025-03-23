@@ -5,6 +5,7 @@ using DataLayer;
 using NLog.Extensions.Logging;
 using ServiceLayer.Services.Parsing;
 using DataLayer.Entities;
+using ServiceLayer.Models;
 
 namespace Parser
 {
@@ -46,18 +47,15 @@ namespace Parser
             {
                 foreach (string region in regions)
                 {
-                    Dictionary<string, string> regionConfig = sourcesConfiguration.GetSection(region).Get<Dictionary<string, string>>()!;
-                    string gismeteoRegionName = regionConfig["Gismeteo"];
-                    string latitude = regionConfig["latitude"];
-                    string longitude = regionConfig["longitude"];
-                    string timezone = regionConfig["timezone"];
+                    DataSource dataSource = sourcesConfiguration.GetSection(region).Get<DataSource>()!;
+                    dataSource.RegionName = region;
                     try
                     {
-                        IEnumerable<WeatherRecord> gismeteoData = await gismeteoParser.GetWeaterRecordsAsync(region, gismeteoRegionName);
+                        IEnumerable<WeatherRecord> gismeteoData = await gismeteoParser.GetWeaterRecordsAsync(dataSource);
                         programLogger.LogInformation("parse data from {Source} for region {Region}", "Gismeteo", region);
                         await dbContext.WeaterRecords.AddRangeAsync(gismeteoData);
 
-                        IEnumerable<WeatherRecord> openMeteoData = await openMeteoParser.GetWeaterRecordsAsync(region, latitude, longitude, timezone);
+                        IEnumerable<WeatherRecord> openMeteoData = await openMeteoParser.GetWeaterRecordsAsync(dataSource);
                         programLogger.LogInformation("parse data from {Source} for region {Region}", "OpenMeteo", region);
                         await dbContext.WeaterRecords.AddRangeAsync(openMeteoData);
 

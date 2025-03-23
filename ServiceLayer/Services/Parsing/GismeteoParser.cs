@@ -1,6 +1,7 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using DataLayer.Entities;
+using ServiceLayer.Models;
 using ServiceLayer.Models.Errors;
 
 namespace ServiceLayer.Services.Parsing
@@ -8,11 +9,12 @@ namespace ServiceLayer.Services.Parsing
     public class GismeteoParser
     {      
         public const int MaxDays = 10;
+        public const string SourceName = "Gismeteo";
         private static IHtmlCollection<IElement> _rows;
 
-        public async Task<IEnumerable<WeatherRecord>> GetWeaterRecordsAsync(string regionName, string gismeteoRegion)
+        public async Task<IEnumerable<WeatherRecord>> GetWeaterRecordsAsync(DataSource dataSource)
         {    
-            string url = GetUrl(gismeteoRegion);
+            string url = GetUrl(dataSource.Gismeteo);
 
             using HttpClient httpClient = new HttpClient();
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
@@ -50,8 +52,8 @@ namespace ServiceLayer.Services.Parsing
                 return Enumerable.Range(0, MaxDays).Select(i => new WeatherRecord()
                 {
                     ForecastDateTime = today.AddDays(i),
-                    Source = "Gismeteo",
-                    Region = regionName,
+                    Source = SourceName,
+                    Region = dataSource.RegionName,
 
                     TemperatureAvg = temprsAvg[i],
                     TemperatureMax = temprsMax[i],
@@ -69,7 +71,7 @@ namespace ServiceLayer.Services.Parsing
             }
         }
 
-        private string GetUrl(string region)
+        private static string GetUrl(string region)
         {
             return @$"https://www.gismeteo.ru/{region}/10-days/";
         }
