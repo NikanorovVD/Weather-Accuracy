@@ -1,62 +1,72 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using DataLayer.Entities;
+using ServiceLayer.Models.Errors;
 
 namespace ServiceLayer.Services.Parsing
 {
     public class GismeteoParser
     {      
         public const int MaxDays = 10;
-
         private static IHtmlCollection<IElement> _rows;
+
         public async Task<IEnumerable<WeatherRecord>> GetWeaterRecordsAsync(string regionName, string gismeteoRegion)
         {    
             string url = GetUrl(gismeteoRegion);
-            HttpRequestMessage httpRequest = new HttpRequestMessage(HttpMethod.Get, url);
 
-            HttpClient client = new HttpClient();
-            HttpResponseMessage responseMessage = await client.SendAsync(httpRequest);
-            string content = await responseMessage.Content.ReadAsStringAsync();
-            var parser = new HtmlParser();
-            var document = parser.ParseDocument(content);
-            IElement table = document.GetElementsByClassName("widget-items js-scroll-item").Single();
-            _rows = table.Children;
+            using HttpClient httpClient = new HttpClient();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+            HttpResponseMessage response = await httpClient.SendAsync(request);
+            string content = await response.Content.ReadAsStringAsync();
 
-            List<WeatherRecord> records = Enumerable.Range(0, MaxDays).Select(_ => new WeatherRecord()).ToList();
+            if (!response.IsSuccessStatusCode) 
+                throw new RequestException("Error status code", url, response.StatusCode, content);
 
-            decimal[] temprsAvg = GetParameter(GetTemperatureAvg);
-            decimal?[] temprsMax = GetParameter(GetTemperatureMax);
-            decimal?[] temprsMin = GetParameter(GetTemperatureMin);
-            decimal[] preticipations = GetParameter(GetPreticipation);
-            decimal[] pressureMax = GetParameter(GetMaxPressure);
-            decimal[] pressureMin = GetParameter(GetMinPressure);
-            decimal[] humidity = GetParameter(GetHumidity);
-            uint[] uv = GetParameter(GetUVIndex);
-            uint[] geomagnetic = GetParameter(GetGeomagneticActivity);
-            decimal[] windSpeed = GetParameter(GetWindSpeed);
-            decimal?[] windGust = GetParameter(GetWindGust);
-            string[] windDirection = GetParameter(GetWindDirection);
-            string[] coudCover = GetParameter(GetCloudCover);
-
-            DateTime today = DateTime.UtcNow.Date;
-
-            for (int i = 0; i < MaxDays; i++)
+            try
             {
-                records[i].ForecastDateTime = today.AddDays(i);
-                records[i].Source = "Gismeteo";
-                records[i].Region = regionName;
+                var parser = new HtmlParser();
+                var document = parser.ParseDocument(content);
+                IElement table = document.GetElementsByClassName("widget-items js-scroll-item").Single();
+                _rows = table.Children;
 
-                records[i].TemperatureAvg = temprsAvg[i];
-                records[i].TemperatureMax = temprsMax[i];
-                records[i].TemperatureMin = temprsMin[i];
-                records[i].Precipitation = preticipations[i];
-                records[i].AtmosphericPressureAvg = (pressureMin[i]+ pressureMax[i]) / 2;
-                records[i].Humidity = humidity[i];
-                records[i].WindSpeed = windSpeed[i];
-                records[i].WindGust = windGust[i];
+                List<WeatherRecord> records = Enumerable.Range(0, MaxDays).Select(_ => new WeatherRecord()).ToList();
+
+                decimal[] temprsAvg = GetParameter(GetTemperatureAvg);
+                decimal?[] temprsMax = GetParameter(GetTemperatureMax);
+                decimal?[] temprsMin = GetParameter(GetTemperatureMin);
+                decimal[] preticipations = GetParameter(GetPreticipation);
+                decimal[] pressureMax = GetParameter(GetMaxPressure);
+                decimal[] pressureMin = GetParameter(GetMinPressure);
+                decimal[] humidity = GetParameter(GetHumidity);
+                uint[] uv = GetParameter(GetUVIndex);
+                uint[] geomagnetic = GetParameter(GetGeomagneticActivity);
+                decimal[] windSpeed = GetParameter(GetWindSpeed);
+                decimal?[] windGust = GetParameter(GetWindGust);
+                string[] windDirection = GetParameter(GetWindDirection);
+                string[] coudCover = GetParameter(GetCloudCover);
+
+                DateTime today = DateTime.UtcNow.Date;
+
+                return Enumerable.Range(0, MaxDays).Select(i => new WeatherRecord()
+                {
+                    ForecastDateTime = today.AddDays(i),
+                    Source = "Gismeteo",
+                    Region = regionName,
+
+                    TemperatureAvg = temprsAvg[i],
+                    TemperatureMax = temprsMax[i],
+                    TemperatureMin = temprsMin[i],
+                    Precipitation = preticipations[i],
+                    AtmosphericPressureAvg = (pressureMin[i] + pressureMax[i]) / 2,
+                    Humidity = humidity[i],
+                    WindSpeed = windSpeed[i],
+                    WindGust = windGust[i],
+                });
             }
-
-            return records[..MaxDays];
+            catch (Exception ex) 
+            {
+                throw new RequestException($"Error parsing data: {ex}", url, response.StatusCode, content);
+            }
         }
 
         private string GetUrl(string region)

@@ -1,4 +1,5 @@
 ﻿using DataLayer.Entities;
+using ServiceLayer.Models.Errors;
 using System.Text.Json;
 
 namespace ServiceLayer.Services.Parsing
@@ -16,36 +17,31 @@ namespace ServiceLayer.Services.Parsing
                 ("timezone", timezone),
                 ("forecast_days", MaxDays.ToString())
                 );
+
             using HttpClient client = new HttpClient();
-
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestString);
             HttpResponseMessage response = await client.GetAsync(requestString);
-            if (!response.IsSuccessStatusCode) throw new Exception($"Forecast request failed with code {response.StatusCode}" +
-                $"{Environment.NewLine}{await response.Content.ReadAsStringAsync()}" +
-                $"{Environment.NewLine}Request was: {requestString}");
+            string content = await response.Content.ReadAsStringAsync();
 
-            OpenMeteoResponse? openMeteoResponse = JsonSerializer.Deserialize<OpenMeteoResponse>(response.Content.ReadAsStream());
-            if (openMeteoResponse == null) throw new Exception($"Archive record deserilization failed;" +
-                $" Received message:{Environment.NewLine}{await response.Content.ReadAsStringAsync()}");
+            if (!response.IsSuccessStatusCode)
+                throw new RequestException("Error status code", requestString, response.StatusCode, content);
 
-            List<WeatherRecord> records = [];
-            for (int i = 0; i < MaxDays; i++)
+            OpenMeteoResponse? openMeteoResponse = JsonSerializer.Deserialize<OpenMeteoResponse>(content) 
+                ?? throw new RequestException("Error status code", requestString, response.StatusCode, content);
+
+            return Enumerable.Range(0, MaxDays).Select(i => new WeatherRecord()
             {
-                WeatherRecord record = new WeatherRecord()
-                {
-                    ForecastDateTime = DateTime.UtcNow.AddDays(i),
-                    Source = "OpenMeteo",
-                    Region = regionName,
+                ForecastDateTime = DateTime.UtcNow.AddDays(i),
+                Source = "OpenMeteo",
+                Region = regionName,
 
-                    TemperatureMin = openMeteoResponse.daily.temperature_2m_min.ElementAt(i),
-                    TemperatureMax = openMeteoResponse.daily.temperature_2m_max.ElementAt(i),
-                    TemperatureAvg = openMeteoResponse.daily.temperature_2m_mean.ElementAt(i),
-                    WindSpeed = openMeteoResponse.daily.wind_speed_10m_max.ElementAt(i),
-                    WindGust = openMeteoResponse.daily.wind_gusts_10m_max.ElementAt(i),
-                    Precipitation = openMeteoResponse.daily.precipitation_sum.ElementAt(i)
-                };
-                records.Add(record);
-            }
-            return records;
+                TemperatureMin = openMeteoResponse.daily.temperature_2m_min.ElementAt(i),
+                TemperatureMax = openMeteoResponse.daily.temperature_2m_max.ElementAt(i),
+                TemperatureAvg = openMeteoResponse.daily.temperature_2m_mean.ElementAt(i),
+                WindSpeed = openMeteoResponse.daily.wind_speed_10m_max.ElementAt(i),
+                WindGust = openMeteoResponse.daily.wind_gusts_10m_max.ElementAt(i),
+                Precipitation = openMeteoResponse.daily.precipitation_sum.ElementAt(i)
+            });
         }
     }
 }
