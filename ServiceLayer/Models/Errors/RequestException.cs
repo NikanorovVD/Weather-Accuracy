@@ -20,7 +20,7 @@ namespace ServiceLayer.Models.Errors
 
         public override string ToString()
         {
-            return $"ulr: {_url}{Environment.NewLine}" +
+            return base.ToString() + Environment.NewLine + $"ulr: {_url}{Environment.NewLine}" +
                 $"status code: {_statusCode}{Environment.NewLine}" +
                 $"content: {_body}{Environment.NewLine}" +
                 $"exception: {base.ToString()}";

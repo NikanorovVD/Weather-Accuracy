@@ -10,6 +10,7 @@ namespace ServiceLayer.Services.Parsing
     {      
         public const int MaxDays = 10;
         private static IHtmlCollection<IElement> _rows;
+        private const string _serverUrl = @"https://www.gismeteo.ru";
         public string SourceName => "Gismeteo";
 
         public async Task<IEnumerable<WeatherRecord>> GetWeaterRecordsAsync(DataSource dataSource)
@@ -73,7 +74,7 @@ namespace ServiceLayer.Services.Parsing
 
         private static string GetUrl(string region)
         {
-            return @$"https://www.gismeteo.ru/{region}/10-days/";
+            return @$"{_serverUrl}/{region}/10-days/";
         }
 
         private static T[] GetParameter<T>(Func<IEnumerable<T>> pasingFunc)
