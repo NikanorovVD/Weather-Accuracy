@@ -4,13 +4,15 @@
     "RP5": "Погода_в_Зеленограде",
     "latitude": 55.9825,
     "longitude": 37.1814,
-    "timezone": "Europe/Moscow"
+    "timezone": "Europe/Moscow",
+    "meteoblue": "Зеленоград_Россия_463829"
   },
   "Москва": {
     "Gismeteo": "weather-moscow-4368",
     "RP5": "Погода_в_Москве_(ВДНХ)",
     "latitude": 55.7522,
     "longitude": 37.6156,
-    "timezone": "Europe/Moscow"
+    "timezone": "Europe/Moscow",
+    "meteoblue": "Москва_Россия_524901"
   }
 }

@@ -43,9 +43,11 @@ namespace Parser
             while (true)
             {
                 List<IWeaterParser> weaterParsers = [
+                   // new YandexParser(),
+                    new MeteoblueParser(),
                     new RP5Parser(),
                     new GismeteoParser(),
-                    new OpenMeteoParser(),
+                    new OpenMeteoParser()
                     ];
 
                 foreach (string region in regions)

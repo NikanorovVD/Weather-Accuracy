@@ -8,5 +8,6 @@
         public string Gismeteo {  get; set; }
         public string Timezone { get; set; }
         public string RP5 {  get; set; }
+        public string Meteoblue {  get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace ServiceLayer.Services.Parsing
 {
     public class OpenMeteoParser: IWeaterParser
     {
-        string _url = "https://api.open-meteo.com/v1/forecast";
+        private const string _url = "https://api.open-meteo.com/v1/forecast";
         public const int MaxDays = 16;
         private static readonly CultureInfo _culture = CultureInfo.CreateSpecificCulture("en-US");
 
