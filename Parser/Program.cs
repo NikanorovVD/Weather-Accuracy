@@ -43,9 +43,9 @@ namespace Parser
             while (true)
             {
                 List<IWeaterParser> weaterParsers = [
-                   // new YandexParser(),
-                    new MeteoblueParser(),
                     new RP5Parser(),
+                    new YandexParser(),
+                    new MeteoblueParser(),
                     new GismeteoParser(),
                     new OpenMeteoParser()
                     ];
@@ -56,7 +56,7 @@ namespace Parser
                     dataSource.RegionName = region;
                     try
                     {
-                        foreach(IWeaterParser parser in weaterParsers)
+                        foreach (IWeaterParser parser in weaterParsers)
                         {
                             IEnumerable<WeatherRecord> data = await parser.GetWeaterRecordsAsync(dataSource);
                             programLogger.LogInformation("parse {DataCount} records from {Source} for region {Region}", data.Count(), parser.SourceName, region);

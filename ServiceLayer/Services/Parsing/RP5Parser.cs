@@ -68,7 +68,7 @@ namespace ServiceLayer.Services.Parsing
 
         int[][] GetColumn(IElement table, string columnContent, string? containerClass, int startIndex)
         {
-            var cells = table
+            List<IElement?> cells = table
               .QuerySelectorAll("tr")
               .Where(
                 tr => tr.QuerySelectorAll("a").Any(el => el.TextContent.Contains(columnContent)) ||
@@ -77,11 +77,11 @@ namespace ServiceLayer.Services.Parsing
               .FirstOrDefault()!
               .Children.ToList()[1..];
 
-            int endIndex = cells.Count / 4 * 4 + 1;
+            int endIndex = (cells.Count - startIndex) / 4 * 4 + 1;
 
             if(containerClass != null) cells = cells.Select(el => el.QuerySelector(containerClass)).ToList();
             int[] values =  cells
-                .Select(el => el.TextContent.Trim())
+                .Select(el => el?.TextContent?.Trim() ?? "0")
                 .ToArray()[startIndex..endIndex]
                 .Select(x => int.TryParse(x, out int y) ? y : 0)
                 .ToArray();
