@@ -20,7 +20,7 @@ namespace ServiceLayer.Services.Parsing
                 ("latitude", dataSource.Latitude.ToString(_culture)),
                 ("longitude", dataSource.Longitude.ToString(_culture)),
                 ("daily", "temperature_2m_max,wind_speed_10m_max,temperature_2m_min,temperature_2m_mean,precipitation_sum,wind_gusts_10m_max"),
-                ("timezone", dataSource.Timezone),
+                ("timezone", "auto"),
                 ("forecast_days", MaxDays.ToString())
                 );
 

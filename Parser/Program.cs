@@ -69,9 +69,9 @@ namespace Parser
                         }
                         await dbContext.SaveChangesAsync();
 
-                    }
-                    await Task.Delay(new TimeSpan(24, 0, 0));
+                    }                  
                 }
+                await Task.Delay(new TimeSpan(24, 0, 0));
             }
         }
     }
