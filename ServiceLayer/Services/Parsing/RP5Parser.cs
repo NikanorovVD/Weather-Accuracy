@@ -33,11 +33,11 @@ namespace ServiceLayer.Services.Parsing
                 .QuerySelector("td")!
                 .GetAttribute("colspan")!);
             int startIndex = colspan - 1;
-     
 
-            decimal[] avgT = GetColumn(table, "Температура", "div.t_0", startIndex).Select(x => (decimal)x.Average()).ToArray();
-            decimal[] minT = GetColumn(table, "Температура", "div.t_0", startIndex).Select(x => (decimal)x.Min()).ToArray();
-            decimal[] maxT = GetColumn(table, "Температура", "div.t_0", startIndex).Select(x => (decimal)x.Max()).ToArray();
+            var temperatures = GetColumn(table, "Температура", "div.t_0", startIndex);
+            decimal[] avgT = temperatures.Select(x => (decimal)x.Average()).ToArray();
+            decimal[] minT = temperatures.Select(x => (decimal)x.Min()).ToArray();
+            decimal[] maxT = temperatures.Select(x => (decimal)x.Max()).ToArray();
             decimal[] pres = GetColumn(table, "Давление", "div.p_0", startIndex).Select(x => (decimal)x.Average()).ToArray();
             decimal[] wind = GetColumn(table, "Ветер: скорость", "div.wv_0", startIndex).Select(x => (decimal)x.Average()).ToArray();
             decimal[] windGust = GetColumn(table, "порывы", "div.wv_0", startIndex).Select(x => (decimal)x.Average()).ToArray();
@@ -49,10 +49,11 @@ namespace ServiceLayer.Services.Parsing
                 ForecastDateTime = DateTime.UtcNow.AddDays(i+1),
                 Source = SourceName,
                 Region = dataSource.RegionName,
+                LeadDays = i+1,
 
                 TemperatureAvg = avgT[i],
-                TemperatureMax = minT[i],
-                TemperatureMin = maxT[i],
+                TemperatureMax = maxT[i],
+                TemperatureMin = minT[i],
                 Precipitation = null,
                 AtmosphericPressureAvg = pres[i],
                 Humidity = humidity[i],
@@ -77,7 +78,7 @@ namespace ServiceLayer.Services.Parsing
               .FirstOrDefault()!
               .Children.ToList()[1..];
 
-            int endIndex = (cells.Count - startIndex) / 4 * 4 + 1;
+            int endIndex = (cells.Count - startIndex) / 4 * 4 + startIndex;
 
             if(containerClass != null) cells = cells.Select(el => el.QuerySelector(containerClass)).ToList();
             int[] values =  cells

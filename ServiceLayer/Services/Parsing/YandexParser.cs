@@ -55,6 +55,7 @@ namespace ServiceLayer.Services.Parsing
                 ForecastDateTime = DateTime.UtcNow.AddDays(i),
                 Source = SourceName,
                 Region = dataSource.RegionName,
+                LeadDays = i,
 
                 TemperatureMax = maxT[i],
                 TemperatureMin = minT[i],

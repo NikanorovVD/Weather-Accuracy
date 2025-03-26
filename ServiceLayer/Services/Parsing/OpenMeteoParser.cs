@@ -40,6 +40,7 @@ namespace ServiceLayer.Services.Parsing
                 ForecastDateTime = DateTime.UtcNow.AddDays(i),
                 Source = SourceName,
                 Region = dataSource.RegionName,
+                LeadDays = i,
 
                 TemperatureMin = openMeteoResponse.daily.temperature_2m_min.ElementAt(i),
                 TemperatureMax = openMeteoResponse.daily.temperature_2m_max.ElementAt(i),

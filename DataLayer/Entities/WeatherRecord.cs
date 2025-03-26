@@ -11,6 +11,7 @@
         public DateTime ForecastDateTime { get; set; }
         public string Source { get; set; }
         public string Region { get; set; }
+        public int LeadDays {  get; set; }
         public decimal? TemperatureAvg { get; set; }
         public decimal? TemperatureMax { get; set; }
         public decimal? TemperatureMin { get; set; }

@@ -32,8 +32,6 @@ namespace ServiceLayer.Services.Parsing
                 IElement table = document.GetElementsByClassName("widget-items js-scroll-item").Single();
                 _rows = table.Children;
 
-                List<WeatherRecord> records = Enumerable.Range(0, MaxDays).Select(_ => new WeatherRecord()).ToList();
-
                 decimal[] temprsAvg = GetParameter(GetTemperatureAvg);
                 decimal?[] temprsMax = GetParameter(GetTemperatureMax);
                 decimal?[] temprsMin = GetParameter(GetTemperatureMin);
@@ -55,6 +53,7 @@ namespace ServiceLayer.Services.Parsing
                     ForecastDateTime = today.AddDays(i),
                     Source = SourceName,
                     Region = dataSource.RegionName,
+                    LeadDays = i,
 
                     TemperatureAvg = temprsAvg[i],
                     TemperatureMax = temprsMax[i],

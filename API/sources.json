@@ -14,5 +14,77 @@
     "longitude": 37.6156,
     "timezone": "Europe/Moscow",
     "meteoblue": "Москва_Россия_524901"
+  },
+  "СПБ": {
+    "Gismeteo": "weather-sankt-peterburg-4079",
+    "RP5": "Погода_в_Санкт-Петербурге",
+    "latitude": 59.9386,
+    "longitude": 30.3144,
+    "timezone": "Europe/Moscow",
+    "meteoblue": "Санкт-Петербург_Россия_498817"
+  },
+  "Новосибирск": {
+    "Gismeteo": "weather-novosibirsk-4690",
+    "RP5": "Погода_в_Новосибирске",
+    "latitude": 55.0302,
+    "longitude": 82.9204,
+    "timezone": "",
+    "meteoblue": "Новосибирск_Россия_1496747"
+  },
+  "Екатеринбург": {
+    "Gismeteo": "weather-yekaterinburg-4517",
+    "RP5": "Погода_в_Екатеринбурге",
+    "latitude": 56.8380,
+    "longitude": 60.5974,
+    "timezone": "",
+    "meteoblue": "Екатеринбург_Россия_1486209"
+  },
+  "Казань": {
+    "Gismeteo": "weather-kazan-4364",
+    "RP5": "Погода_в_Казани,_Татарстан",
+    "latitude": 55.7961,
+    "longitude": 49.1064,
+    "timezone": "",
+    "meteoblue": "Казань_Россия_551487"
+  },
+  "Красноярск": {
+    "Gismeteo": "weather-krasnoyarsk-4674",
+    "RP5": "Погода_в_Красноярске,_Красноярский_край",
+    "latitude": 56.0105,
+    "longitude": 92.8525,
+    "timezone": "",
+    "meteoblue": "Красноярск_Россия_1502026"
+  },
+  "Нижний_Новгород": {
+    "Gismeteo": "weather-nizhny-novgorod-4355",
+    "RP5": "Погода_в_Нижнем_Новгороде",
+    "latitude": 56.3267,
+    "longitude": 44.0065,
+    "timezone": "",
+    "meteoblue": "Нижний-Новгород_Россия_520555"
+  },
+  "Уфа": {
+    "Gismeteo": "weather-ufa-4588",
+    "RP5": "Погода_в_Уфе",
+    "latitude": 54.7351,
+    "longitude": 55.9587,
+    "timezone": "",
+    "meteoblue": "Уфа_Россия_479561"
+  },
+  "Ростов_на_дону": {
+    "Gismeteo": "weather-rostov-na-donu-5110",
+    "RP5": "Погода_в_Ростове-на-Дону",
+    "latitude": 47.2221,
+    "longitude": 39.7188,
+    "timezone": "",
+    "meteoblue": "Ростов-на-Дону_Россия_501175"
+  },
+  "Саратов": {
+    "Gismeteo": "weather-saratov-5032",
+    "RP5": "Погода_в_Саратове",
+    "latitude": 51.5333,
+    "longitude": 46.0341,
+    "timezone": "",
+    "meteoblue": "Саратов_Россия_498677"
   }
 }

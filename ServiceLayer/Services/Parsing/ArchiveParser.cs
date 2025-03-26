@@ -34,12 +34,14 @@ namespace ServiceLayer.Services.Parsing
             {
                 WeatherRecord record = new WeatherRecord()
                 {
+                    ForecastDateTime = from.AddDays(i),
+                    MadeOnDateTime = from.AddDays(i),
+                    
+                    LeadDays = 0,
                     TemperatureMin = arhive.daily.temperature_2m_min.ElementAt(i),
                     TemperatureMax = arhive.daily.temperature_2m_max.ElementAt(i),
                     TemperatureAvg = arhive.daily.temperature_2m_mean.ElementAt(i),
                     Precipitation = arhive.daily.precipitation_sum.ElementAt(i),
-                    ForecastDateTime = from.AddDays(i),
-                    MadeOnDateTime = from.AddDays(i),
                 };
                 records.Add(record);
             }

@@ -54,22 +54,24 @@ namespace Parser
                 {
                     DataSource dataSource = sourcesConfiguration.GetSection(region).Get<DataSource>()!;
                     dataSource.RegionName = region;
-                    try
+
+                    foreach (IWeaterParser parser in weaterParsers)
                     {
-                        foreach (IWeaterParser parser in weaterParsers)
+                        try
                         {
                             IEnumerable<WeatherRecord> data = await parser.GetWeaterRecordsAsync(dataSource);
                             programLogger.LogInformation("parse {DataCount} records from {Source} for region {Region}", data.Count(), parser.SourceName, region);
                             await dbContext.WeaterRecords.AddRangeAsync(data);
                         }
+                        catch (Exception e)
+                        {
+                            programLogger.LogError(e.ToString());
+                        }
                         await dbContext.SaveChangesAsync();
+
                     }
-                    catch (Exception e)
-                    {
-                        programLogger.LogError(e.ToString());
-                    }
+                    await Task.Delay(new TimeSpan(24, 0, 0));
                 }
-                await Task.Delay(new TimeSpan(24, 0, 0));
             }
         }
     }
