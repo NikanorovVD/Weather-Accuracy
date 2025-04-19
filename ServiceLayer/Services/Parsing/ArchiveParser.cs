@@ -1,4 +1,7 @@
 ﻿using DataLayer.Entities;
+using ServiceLayer.Models;
+using ServiceLayer.Models.Errors;
+using System.Globalization;
 using System.Text.Json;
 
 namespace ServiceLayer.Services.Parsing
@@ -6,47 +9,52 @@ namespace ServiceLayer.Services.Parsing
     public class ArchiveParser
     {
         private const string _url = "https://archive-api.open-meteo.com/v1/archive";
+        private static readonly CultureInfo _culture = CultureInfo.CreateSpecificCulture("en-US");
 
-        public async Task<IEnumerable<WeatherRecord>> GetArchiveRecordsAsync(DateTime from, DateTime to)
+        public static string SourceName => "Archive";
+
+        public async Task<IEnumerable<WeatherRecord>> GetArchiveRecordsAsync(DataSource dataSource, DateTime from, DateTime to)
         {
-            string queryString = $"latitude=55&" +
-                $"longitude=37&" +
-                $"start_date={GetDateString(DateOnly.FromDateTime(from))}&" +
-                $"end_date={GetDateString(DateOnly.FromDateTime(to))}&" +
-                $"daily=temperature_2m_max,temperature_2m_min,temperature_2m_mean,precipitation_sum&" +
-                $"timezone=Europe%2FMoscow";
-            string requestString = $"{_url}?{queryString}";
+            string requestString = QueryHelper.CreateQuery(_url,
+                ("latitude", dataSource.Latitude.ToString(_culture)),
+                ("longitude", dataSource.Longitude.ToString(_culture)),
+                ("start_date", GetDateString(DateOnly.FromDateTime(from))),
+                ("end_date", GetDateString(DateOnly.FromDateTime(to))),
+                ("daily", "temperature_2m_max,wind_speed_10m_max,temperature_2m_min,temperature_2m_mean,precipitation_sum,wind_gusts_10m_max,surface_pressure_mean,relative_humidity_2m_mean"),
+                ("timezone", "auto")
+                );
+
             using HttpClient client = new HttpClient();
-
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestString);
             HttpResponseMessage response = await client.GetAsync(requestString);
-            if (!response.IsSuccessStatusCode) throw new Exception($"Archive request failed with code {response.StatusCode}" +
-                $"{Environment.NewLine}{await response.Content.ReadAsStringAsync()}" +
-                $"{Environment.NewLine}Request was: {requestString}");
+            string content = await response.Content.ReadAsStringAsync();
 
-            //Console.WriteLine($" Received message:{Environment.NewLine}{await response.Content.ReadAsStringAsync()}");
-            OpenMeteoResponse? arhive = JsonSerializer.Deserialize<OpenMeteoResponse>(response.Content.ReadAsStream());
-            if (arhive == null) throw new Exception($"Archive record deserilization failed;" +
-                $" Received message:{Environment.NewLine}{await response.Content.ReadAsStringAsync()}");
-           
-            int size = (int)((to - from).TotalDays)+1;
-            List<WeatherRecord> records = [];
-            for(int i = 0; i < size; i++)
+            if (!response.IsSuccessStatusCode)
+                throw new RequestException("Error status code", requestString, response.StatusCode, content);
+
+            OpenMeteoResponse? openMeteoResponse = JsonSerializer.Deserialize<OpenMeteoResponse>(content)
+                ?? throw new RequestException("Error deserilizing data", requestString, response.StatusCode, content);
+
+            int days = (int)((to - from).TotalDays) + 1;
+            return Enumerable.Range(0, days).Select(i => new WeatherRecord()
             {
-                WeatherRecord record = new WeatherRecord()
-                {
-                    ForecastDateTime = from.AddDays(i),
-                    MadeOnDateTime = from.AddDays(i),
-                    
-                    LeadDays = 0,
-                    TemperatureMin = arhive.daily.temperature_2m_min.ElementAt(i),
-                    TemperatureMax = arhive.daily.temperature_2m_max.ElementAt(i),
-                    TemperatureAvg = arhive.daily.temperature_2m_mean.ElementAt(i),
-                    Precipitation = arhive.daily.precipitation_sum.ElementAt(i),
-                };
-                records.Add(record);
-            }
-            return records;
+                ForecastDateTime = from.AddDays(i),
+                MadeOnDateTime = from.AddDays(i),
+                Source = SourceName,
+                Region = dataSource.RegionName,
+                LeadDays = 0,
+
+                TemperatureMin = openMeteoResponse.daily.temperature_2m_min.ElementAt(i),
+                TemperatureMax = openMeteoResponse.daily.temperature_2m_max.ElementAt(i),
+                TemperatureAvg = openMeteoResponse.daily.temperature_2m_mean.ElementAt(i),
+                WindSpeed = openMeteoResponse.daily.wind_speed_10m_max.ElementAt(i),
+                WindGust = openMeteoResponse.daily.wind_gusts_10m_max.ElementAt(i),
+                Precipitation = openMeteoResponse.daily.precipitation_sum.ElementAt(i),
+                AtmosphericPressureAvg = openMeteoResponse.daily.surface_pressure_mean.ElementAt(i) * 0.750064M,
+                Humidity = openMeteoResponse.daily.relative_humidity_2m_mean.ElementAt(i)
+            });     
         }
+
 
         private string GetDateString(DateOnly date)
         {
@@ -84,6 +92,8 @@ namespace ServiceLayer.Services.Parsing
             public IEnumerable<decimal?> precipitation_sum { get; set; }
             public IEnumerable<decimal?> wind_speed_10m_max { get; set; }
             public IEnumerable<decimal?> wind_gusts_10m_max { get; set; }
+            public IEnumerable<decimal?> surface_pressure_mean { get; set; }
+            public IEnumerable<decimal?> relative_humidity_2m_mean { get; set; }
 
         }
     }

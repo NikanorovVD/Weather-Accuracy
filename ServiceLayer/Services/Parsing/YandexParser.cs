@@ -29,6 +29,7 @@ namespace ServiceLayer.Services.Parsing
             var document = parser.ParseDocument(content);
 
             int startIndex = (int)DateTime.Now.DayOfWeek - 1;
+            if (startIndex == -1) startIndex = 6;
 
             decimal[] maxT = ParseParameter(document, ".climate-calendar-day__detailed-basic-temp-day .temp__value", startIndex)
                  .Select(s => decimal.Parse(s.Replace('−', '-')))

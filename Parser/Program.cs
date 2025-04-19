@@ -40,6 +40,22 @@ namespace Parser
             AppDbContext dbContext = new(optionsBuilder.Options);
             await dbContext.Database.MigrateAsync();
 
+
+            ArchiveParser archiveParser = new ArchiveParser();
+            foreach (string region in regions)
+            {
+                DataSource dataSource = sourcesConfiguration.GetSection(region).Get<DataSource>()!;
+                dataSource.RegionName = region;
+
+                IEnumerable<WeatherRecord> records = await archiveParser.GetArchiveRecordsAsync
+                    (dataSource, DateTime.UtcNow.AddDays(-20), DateTime.UtcNow.AddDays(-1));
+                programLogger.LogInformation("Parse {DataCount} archive records for regin {Region}", records.Count(), dataSource.RegionName);
+                await dbContext.WeaterRecords.AddRangeAsync(records);
+            }
+
+            await dbContext.SaveChangesAsync();
+
+            return;
             while (true)
             {
                 List<IWeaterParser> weaterParsers = [
@@ -50,28 +66,33 @@ namespace Parser
                     new OpenMeteoParser()
                     ];
 
-                foreach (string region in regions)
-                {
-                    DataSource dataSource = sourcesConfiguration.GetSection(region).Get<DataSource>()!;
-                    dataSource.RegionName = region;
+                //int i = regions.IndexOf("”Ù‡");
+                //regions = regions[i..];
+                //regions = ["—œ¡"];
 
-                    foreach (IWeaterParser parser in weaterParsers)
-                    {
-                        try
-                        {
-                            IEnumerable<WeatherRecord> data = await parser.GetWeaterRecordsAsync(dataSource);
-                            programLogger.LogInformation("parse {DataCount} records from {Source} for region {Region}", data.Count(), parser.SourceName, region);
-                            await dbContext.WeaterRecords.AddRangeAsync(data);
-                        }
-                        catch (Exception e)
-                        {
-                            programLogger.LogError(e.ToString());
-                        }
-                        await dbContext.SaveChangesAsync();
+                //foreach (string region in regions)
+                //{
+                //    DataSource dataSource = sourcesConfiguration.GetSection(region).Get<DataSource>()!;
+                //    dataSource.RegionName = region;
 
-                    }                  
-                }
-                await Task.Delay(new TimeSpan(24, 0, 0));
+                //    foreach (IWeaterParser parser in weaterParsers)
+                //    {
+                //        try
+                //        {
+                //            IEnumerable<WeatherRecord> data = await parser.GetWeaterRecordsAsync(dataSource);
+                //            programLogger.LogInformation("parse {DataCount} records from {Source} for region {Region}", data.Count(), parser.SourceName, region);
+                //            await dbContext.WeaterRecords.AddRangeAsync(data);
+                //        }
+                //        catch (Exception e)
+                //        {
+                //            programLogger.LogError("Error in {Parser} parser for region {Region}. Exception: {Error}",parser.SourceName, region, e.ToString());
+                //        }
+                //        await dbContext.SaveChangesAsync();
+                //    }
+                //}
+                //await Task.Delay(new TimeSpan(24, 0, 0));
+
+
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using DataLayer;
 using DataLayer.Entities;
+using ServiceLayer.Models;
 using ServiceLayer.Services.Parsing;
 
 namespace ServiceLayer.Services
@@ -14,16 +15,16 @@ namespace ServiceLayer.Services
             _appDbContext = appDbContext;
         }
 
-        public async Task CreateFactRecords(DateTime from)
+        public async Task CreateFactRecords(DataSource dataSource, DateTime from)
         {
-            var records = GetFactRecords(from, DateTime.Now.AddDays(-1));
+            var records = GetFactRecords(dataSource, from, DateTime.Now.AddDays(-1));
             _appDbContext.AddRange(records);
             //_appDbContext.SaveChanges();
         }
 
-        private async Task<IEnumerable<WeatherRecord>> GetFactRecords(DateTime from, DateTime to)
+        public async Task<IEnumerable<WeatherRecord>> GetFactRecords(DataSource dataSource, DateTime from, DateTime to)
         {
-            return await _archiveParser.GetArchiveRecordsAsync(from, to);
+            return await _archiveParser.GetArchiveRecordsAsync(dataSource, from, to);
         }
     }
 }

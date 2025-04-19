@@ -27,6 +27,7 @@ namespace API
             services.AddScoped<ISignInService, SignInService>();
             services.AddScoped<ITokenService, JwtTokenService>();
             services.AddScoped<IUserClaimsService, UserClaimsService>();
+            services.AddScoped<AccuracyService, AccuracyService>();
         }
 
         public static void ConfigureApp(this IServiceCollection services, IConfiguration configuration)

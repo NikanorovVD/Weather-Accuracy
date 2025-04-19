@@ -37,14 +37,12 @@ namespace ServiceLayer.Services.Parsing
                 decimal?[] temprsMin = GetParameter(GetTemperatureMin);
                 decimal[] preticipations = GetParameter(GetPreticipation);
                 decimal[] pressureMax = GetParameter(GetMaxPressure);
-                decimal[] pressureMin = GetParameter(GetMinPressure);
+                decimal?[] pressureMinNullable = GetParameter(GetMinPressure);
+                decimal[] pressureMin = Enumerable.Range(0, pressureMinNullable.Length)
+                    .Select(i => pressureMinNullable[i] == null ? pressureMax[i] : pressureMinNullable[i].Value).ToArray();
                 decimal[] humidity = GetParameter(GetHumidity);
-                uint[] uv = GetParameter(GetUVIndex);
-                uint[] geomagnetic = GetParameter(GetGeomagneticActivity);
                 decimal[] windSpeed = GetParameter(GetWindSpeed);
-                decimal?[] windGust = GetParameter(GetWindGust);
-                string[] windDirection = GetParameter(GetWindDirection);
-                string[] coudCover = GetParameter(GetCloudCover);
+                decimal[] windGust = GetParameter(GetWindGust);
 
                 DateTime today = DateTime.UtcNow.Date;
 
@@ -139,16 +137,17 @@ namespace ServiceLayer.Services.Parsing
             return values.Select(t => decimal.Parse(t));
         }
 
-        private static IEnumerable<decimal> GetMinPressure()
+        private static IEnumerable<decimal?> GetMinPressure()
         {
             IElement tempr_row = _rows.Where(r => r.GetAttribute("data-row") == "pressure").Single();
             var values = tempr_row
                 .GetElementsByClassName("chart")
                 .Single()
-                .GetElementsByClassName("mint")
-                .SelectMany(e => e.QuerySelectorAll("pressure-value"))
-                .Select(v => v.GetAttribute("value"));
-            return values.Select(t => decimal.Parse(t));
+                .GetElementsByClassName("value")
+                .Select(v => v.QuerySelector(".mint"))
+                .Select(e => e?.QuerySelector("pressure-value"))
+                .Select(v => v?.GetAttribute("value"));
+            return values.Select<string?, decimal?>(t => t == null ? null : decimal.Parse(t));
         }
 
         private static IEnumerable<decimal> GetHumidity()
@@ -181,21 +180,27 @@ namespace ServiceLayer.Services.Parsing
 
         private static IEnumerable<decimal> GetWindSpeed()
         {
-            IElement tempr_row = _rows.Where(r => r.GetAttribute("data-row") == "wind-speed").Single();
+            IElement tempr_row = _rows.Where(r => r.GetAttribute("data-row") == "wind").Single();
             return tempr_row
                 .GetElementsByClassName("row-item")
-                .Select(r => r.GetElementsByTagName("speed-value").Single())
+                .Select(r => r.QuerySelectorAll("speed-value")[0])
                 .Select(v => v.GetAttribute("value"))
                 .Select(t => decimal.Parse(t));
         }
-        private static IEnumerable<decimal?> GetWindGust()
+        private static IEnumerable<decimal> GetWindGust()
         {
-            IElement tempr_row = _rows.Where(r => r.GetAttribute("data-row") == "wind-gust").Single();
-            var rowItems = tempr_row.GetElementsByClassName("row-item");
-            return rowItems
-                .Select(r => r.GetElementsByTagName("speed-value").SingleOrDefault())
-                .Select(v => v?.GetAttribute("value"))
-                .Select<string?, decimal?>(t => t == null ? null : decimal.Parse(t));
+            IElement tempr_row = _rows.Where(r => r.GetAttribute("data-row") == "wind").Single();
+            return tempr_row
+                .GetElementsByClassName("row-item")
+                .Select(r => r.QuerySelectorAll("speed-value")[1])
+                .Select(v => v.GetAttribute("value"))
+                .Select(t => decimal.Parse(t));
+            //IElement tempr_row = _rows.Where(r => r.GetAttribute("data-row") == "wind-gust").Single();
+            //var rowItems = tempr_row.GetElementsByClassName("row-item");
+            //return rowItems
+            //    .Select(r => r.GetElementsByTagName("speed-value").SingleOrDefault())
+            //    .Select(v => v?.GetAttribute("value"))
+            //    .Select<string?, decimal?>(t => t == null ? null : decimal.Parse(t));
         }
 
         private static IEnumerable<string> GetWindDirection()

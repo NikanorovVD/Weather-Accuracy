@@ -86,5 +86,46 @@
     "longitude": 46.0341,
     "timezone": "",
     "meteoblue": "Саратов_Россия_498677"
+  },
+  "Сочи": {
+    "Gismeteo": "weather-sochi-5233",
+    "RP5": "Погода_в_Сочи",
+    "latitude": 43.5854,
+    "longitude": 39.7230,
+    "timezone": "",
+    "meteoblue": "Сочи_Россия_491422"
+  },
+  "Сыктывкар": {
+    "Gismeteo": "weather-syktyvkar-3989",
+    "RP5": "Погода_в_Сыктывкаре",
+    "latitude": 61.6687,
+    "longitude": 50.8364,
+    "timezone": "",
+    "meteoblue": "Сыктывкар_Россия_485239"
+  },
+  "Челябинск": {
+    "Gismeteo": "weather-chelyabinsk-4565",
+    "RP5": "Погода_в_Челябинске",
+    "latitude": 55.1599,
+    "longitude": 61.4025,
+    "timezone": "",
+    "meteoblue": "Челябинск_Россия_1508291"
+  },
+  "Самара": {
+    "Gismeteo": "weather-samara-4618",
+    "RP5": "Погода_в_Самаре,_Самарская_область",
+    "latitude": 53.1958,
+    "longitude": 50.1002,
+    "timezone": "",
+    "meteoblue": "Самара_Россия_499099"
+  },
+  "Краснодар": {
+    "Gismeteo": "weather-krasnodar-5136",
+    "RP5": "Погода_в_Краснодаре,_Краснодарский_край",
+    "latitude": 45.0354,
+    "longitude": 38.9753,
+    "timezone": "",
+    "meteoblue": "Краснодар_Россия_542420"
   }
+
 }
